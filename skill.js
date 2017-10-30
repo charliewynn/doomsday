@@ -228,7 +228,7 @@ const handlers = {
 			//this.emit(':tell', guess + ' ' + date);
 			if(guess == 'help'){
 
-				this.emit(':tell', "Sure, here's how I'd do it...");
+				this.emit(':tell', "Sure, here's how I'd do it. " + walkthrough(date));
 			}
 			var ans = dows[date.getDay()];
 			if(ans == guess){
@@ -246,7 +246,7 @@ const handlers = {
 				}
 				else
 				{
-					this.emit(':tell', "hmm, still no luck.. Here's how I'd do it");
+					this.emit(':tell', "hmm, still no luck.. Here's how I'd do it. " + walkthrough(date));
 				}
 			}
 
