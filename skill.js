@@ -83,13 +83,13 @@ function getDoomsday(){
 	return dows[year];
 }
 function numToOrdinal(num){
-	if(num == 1) return num + 'st';
-	if(num == 2) return num + 'nd';
-	if(num == 3) return num + 'rd';
+	if(num % 10 == 1) return num + 'st';
+	if(num % 10 == 2) return num + 'nd';
+	if(num % 10 == 3) return num + 'rd';
 	return num + 'th';
 }
 
-function walkthrough(day){
+function walkthrough(day, testing){
 	var anchor = new Date(day);
 	var leapYear = false;
 	if(day.getFullYear() % 4 == 0)
@@ -102,79 +102,88 @@ function walkthrough(day){
 	var date = day.getDate();
 
 	var output = "Let's figure out " + months[day.getMonth()] + " " + numToOrdinal(day.getDate()) + ". ";
+	var anchorDateNum = -1;
 	switch(month+1)
 	{
 		case 1:
 			if(leapYear){
 				output += "It's a leap year so January 4th is our anchor day. ";
-				anchor.setDate(4);
+				anchor.setDate(anchorDateNum = 4);
 			} else {
 				output += "It's not a leap year so January 3rd is our anchor day. ";
-				anchor.setDate(3);
+				anchor.setDate(anchorDateNum = 3);
 			}
 			break;
 		case 2:
 			if(leapYear){
 				output += "It's a leap year so we start with February 29th and work backwards. ";
-				anchor.setDate(29);
+				anchor.setDate(anchorDateNum = 29);
 			}
 			else{
 				output += "It's not a leap year so we start with February 28th and work backwards. ";
-				anchor.setDate(28);
+				anchor.setDate(anchorDateNum = 28);
 			}
 			break;
 		case 3:
 			output += "For March we start with the last day of February, called March Zeroth. ";
-			anchor.setDate(0);
+			anchor.setDate(anchorDateNum = 0);
 			break;
 		case 4:
 			output += "April is an even numbered month, so take it's month number, four, i.e. April 4th as our anchor date. ";
-			anchor.setDate(4);
+			anchor.setDate(anchorDateNum = 4);
 			break;
 		case 5:
 			output += "For May remember nine to five at seven eleven. So start with May ninth. ";
-			anchor.setDate(9);
+			anchor.setDate(anchorDateNum = 9);
 			break;
 		case 6:
 			output += "June is an even numbered month, so take it's month number, six, i.e. June 6th as our anchor date. ";
-			anchor.setDate(6);
+			anchor.setDate(anchorDateNum = 6);
 			break;
 		case 7:
 			output += "For July we remember nine to five at seven eleven, so start with July 11th.  July 4th is always a doomsday too by the way. ";
-			anchor.setDate(11);
+			anchor.setDate(anchorDateNum = 11);
 			break;
 		case 8:
 			output += "August is an even numbered month, so take it's month number, eight, i.e. August 8th as our anchor date. ";
-			anchor.setDate(8);
+			anchor.setDate(anchorDateNum = 8);
 			break;
 		case 9:
 			output += "September falls under our nine to five at seven eleven rule. So September fifth is our achor. ";
-			anchor.setDate(5);
+			anchor.setDate(anchorDateNum = 5);
 			break;
 		case 10:
 			output += "October is an even numbered month, so take it's month number, ten, i.e. October 10th as our anchor date. ";
-			anchor.setDate(10);
+			anchor.setDate(anchorDateNum = 10);
 			break;
 		case 11:
 			output += "November is another nine to five at seven eleven month, so November 7th is our anchor. ";
-			anchor.setDate(7);
+			anchor.setDate(anchorDateNum = 7);
 			break;			
 		case 12:
 			output += "December is an even numbered month, so take it's month number, twelve, i.e. December 12th as our anchor date. ";
-			anchor.setDate(12);
+			anchor.setDate(anchorDateNum = 12);
 			break;
 
 	}
+	var outputResp = [];
 	var daysAway = Math.round((day-anchor)/(1000*60*60*24));
-	var weeksAway = Math.floor(daysAway / 7);
-	console.log('days away', daysAway);
+	var weeksAway = Math.round(daysAway / 7);
+	/*if(daysAway < 0){
+		weeksAway++;// = Math.ceil(daysAway/7);
+		daysAway += 7;
+	}*/
+	if(!testing) console.log('days away', daysAway);
+	if(!testing) console.log('weeks away', weeksAway);
 	if(daysAway == 0){
+		outputResp = [0,0];
 		output += "And we're done! Our day was a doomsday so the answer is " + getDoomsday();
 	}
 	else if(daysAway % 7 == 0){
 		output += "If we count ";
 		output += (daysAway < 0) ? "backwards" : "forwards";
-		output += " " + weeksAway; 
+		output += " " + weeksAway;
+		outputResp = [weeksAway, 0];
 		if(weeksAway == 1) {
 			output += " week ";
 		}
@@ -183,26 +192,63 @@ function walkthrough(day){
 		}
 		output += " we see our day is a doomsday and our answer is " + getDoomsday();
 	}
-	else {
+	else if(weeksAway == 0){
 		output += "If we count ";
 		output += (daysAway < 0) ? "backwards" : "forwards";
-		output += " " + weeksAway;
-		if(weeksAway == 1) {
+		output += " " + Math.abs(daysAway);
+		output += Math.abs(daysAway) == 1 ? " day " : " days ";
+		output += "we can tell our answer is a " + dows[day.getDay()];
+		outputResp = [0, daysAway];
+	}
+	else {
+		var daysOff = daysAway % 7;
+		var weeksGoNegative = anchor.getDate();
+
+		output += "If we count ";
+		output += (daysAway < 0) ? "backwards" : "forwards";
+		output += " " + Math.abs(weeksAway);
+		if(Math.abs(weeksAway) == 1) {
 			output += " week ";
 		}
 		else {
 			output += " weeks ";
 		}
-		output += "we can tell the " + numToOrdinal(anchor.getDate() + (weeksAway * 7)) + " is a " + getDoomsday();
+		output += "we can tell the " + numToOrdinal(anchorDateNum + (weeksAway * 7)) + " is a " + getDoomsday();
 		var daysLeft = daysAway - (weeksAway * 7);
-		output += ". Now we count forward " + daysLeft + " days to our start date and see that the " + numToOrdinal(day.getDate());
+		outputResp = [weeksAway, daysLeft];
+		output += ". Now we count ";
+		output += daysLeft < 0 ? "backwards " : "forward ";
+		output += Math.abs(daysLeft);
+		output += Math.abs(daysLeft) == 1 ? " day " : " days ";
+		output += "to our start date and see that the " + numToOrdinal(day.getDate());
 		output += (day > new Date()) ? " will be " : " was ";
 		output += "a " + dows[day.getDay()];
 
 		//calculate number of days away and do the rest of the math
 	}
-	return output;
+	return testing ? outputResp : output;
 
+}
+function test(){
+	var tests = [
+		[new Date(2017, 4, 22), 2, -1],
+		[new Date(2017, 4, 9), 0, 0],
+		[new Date(2017, 4, 10), 0, 1],
+		[new Date(2017, 0, 1), 0, -2],
+		[new Date(2017, 0, 18), 2, 1],
+		[new Date(2017, 2, 18), 3, -3],
+	];
+	var passed = true;
+	for(test in tests){
+		var t = tests[test];
+		var res = walkthrough(t[0], 1);
+		if(res[0] != t[1] || res[1] != t[2]){
+			console.log("Problem with " + t[0] + " || expected " + t[1] + " weeks " + t[2] + " days but got " + res[0] + " weeks " + res[1] + " days");
+			console.log("\r\n -- \r\n " + walkthrough(t[0]));
+			passed = false;
+		}
+	}
+	if(passed) console.log("all tests passed");
 }
 
 const handlers = {
