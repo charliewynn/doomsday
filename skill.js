@@ -90,7 +90,7 @@ function numToOrdinal(num){
 }
 
 function walkthrough(day){
-	var datecopy = new Date(day);
+	var anchor = new Date(day);
 	var leapYear = false;
 	if(day.getFullYear() % 4 == 0)
 		if(day.getFullYear() % 400 == 0)
@@ -102,28 +102,80 @@ function walkthrough(day){
 	var date = day.getDate();
 
 	var output = "Let's figure out " + months[day.getMonth()] + " " + numToOrdinal(day.getDate()) + ". ";
-	var anchor = undefined;
-	switch(month)
+	switch(month+1)
 	{
-		case 0:
+		case 1:
 			if(leapYear){
-				output = "It's a leap year so January 4th is our anchor day. ";
-				anchor = datecopy.setDate(4);
+				output += "It's a leap year so January 4th is our anchor day. ";
+				anchor.setDate(4);
 			} else {
-				output = "It's not a leap year so January 3rd is our anchor day. ";
-				achor = datecopy.setDate(3);
+				output += "It's not a leap year so January 3rd is our anchor day. ";
+				anchor.setDate(3);
 			}
 			break;
+		case 2:
+			if(leapYear){
+				output += "It's a leap year so we start with February 29th and work backwards. ";
+				anchor.setDate(29);
+			}
+			else{
+				output += "It's not a leap year so we start with February 28th and work backwards. ";
+				anchor.setDate(28);
+			}
+			break;
+		case 3:
+			output += "For March we start with the last day of February, called March Zeroth. ";
+			anchor.setDate(0);
+			break;
+		case 4:
+			output += "April is an even numbered month, so take it's month number, four, i.e. April 4th as our anchor date. ";
+			anchor.setDate(4);
+			break;
+		case 5:
+			output += "For May remember nine to five at seven eleven. So start with May ninth. ";
+			anchor.setDate(9);
+			break;
+		case 6:
+			output += "June is an even numbered month, so take it's month number, six, i.e. June 6th as our anchor date. ";
+			anchor.setDate(6);
+			break;
+		case 7:
+			output += "For July we remember nine to five at seven eleven, so start with July 11th.  July 4th is always a doomsday too by the way. ";
+			anchor.setDate(11);
+			break;
+		case 8:
+			output += "August is an even numbered month, so take it's month number, eight, i.e. August 8th as our anchor date. ";
+			anchor.setDate(8);
+			break;
+		case 9:
+			output += "September falls under our nine to five at seven eleven rule. So September fifth is our achor. ";
+			anchor.setDate(5);
+			break;
+		case 10:
+			output += "October is an even numbered month, so take it's month number, ten, i.e. October 10th as our anchor date. ";
+			anchor.setDate(10);
+			break;
+		case 11:
+			output += "November is another nine to five at seven eleven month, so November 7th is our anchor. ";
+			anchor.setDate(7);
+			break;			
+		case 12:
+			output += "December is an even numbered month, so take it's month number, twelve, i.e. December 12th as our anchor date. ";
+			anchor.setDate(12);
+			break;
+
 	}
-	var daysAway = Math.round((a-b)/(1000*60*60*24));
+	var daysAway = Math.round((day-anchor)/(1000*60*60*24));
+	var weeksAway = Math.floor(daysAway / 7);
+	console.log('days away', daysAway);
 	if(daysAway == 0){
 		output += "And we're done! Our day was a doomsday so the answer is " + getDoomsday();
 	}
 	else if(daysAway % 7 == 0){
 		output += "If we count ";
 		output += (daysAway < 0) ? "backwards" : "forwards";
-		output += " " + daysAway % 7; 
-		if(daysAway % 7 == 1) {
+		output += " " + weeksAway; 
+		if(weeksAway == 1) {
 			output += " week ";
 		}
 		else {
@@ -134,16 +186,22 @@ function walkthrough(day){
 	else {
 		output += "If we count ";
 		output += (daysAway < 0) ? "backwards" : "forwards";
-		output += " " + daysAway % 7; 
-		if(daysAway % 7 == 1) {
+		output += " " + weeksAway;
+		if(weeksAway == 1) {
 			output += " week ";
 		}
 		else {
 			output += " weeks ";
 		}
+		output += "we can tell the " + numToOrdinal(anchor.getDate() + (weeksAway * 7)) + " is a " + getDoomsday();
+		var daysLeft = daysAway - (weeksAway * 7);
+		output += ". Now we count forward " + daysLeft + " days to our start date and see that the " + numToOrdinal(day.getDate());
+		output += (day > new Date()) ? " will be " : " was ";
+		output += "a " + dows[day.getDay()];
 
 		//calculate number of days away and do the rest of the math
 	}
+	return output;
 
 }
 
