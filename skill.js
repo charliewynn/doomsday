@@ -27,94 +27,94 @@ const STOP_MESSAGE = 'Goodbye!';
 //=========================================================================================================================================
 
 exports.handler = function(event, context, callback) {
-  var alexa = Alexa.handler(event, context);
-  alexa.appId = APP_ID;
-  alexa.registerHandlers(handlers);
-  alexa.execute();
+	var alexa = Alexa.handler(event, context);
+	alexa.appId = APP_ID;
+	alexa.registerHandlers(handlers);
+	alexa.execute();
 };
 
 function randomDate(start, end) {
-  var date = new Date(+start + Math.random() * (end - start));
-  return date;
+	var date = new Date(+start + Math.random() * (end - start));
+	return date;
 }
 
 function randomDateThisYear(){
-  var start = new Date().setMonth(0);
-  start = (new Date(start)).setDate(1);
-  var end = new Date().setMonth(11);
-  end = (new Date(end)).setDate(31);
-  return randomDate(start, end);
+	var start = new Date().setMonth(0);
+	start = (new Date(start)).setDate(1);
+	var end = new Date().setMonth(11);
+	end = (new Date(end)).setDate(31);
+	return randomDate(start, end);
 }
 const dows = 
-  [
-	'Sunday',
-	'Monday',
-	'Tuesday',
-	'Wednesday',
-	'Thursday',
-	'Friday',
-	'Saturday'
-  ];
+	[
+		'Sunday',
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday'
+	];
 
 const months =
-  [
-	'January',
-	'February',
-	'March',
-	'April',
-	'May',
-	'June',
-	'July',
-	'August',
-	'September',
-	'October',
-	'November',
-	'December'
-  ];
+	[
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
+	];
 
 function getDoomsday(){
-  var year = (new Date()).getFullYear() % 100;
-  if(year % 2 == 1) year += 11;
-  year /= 2;
-  if(year % 2 == 1) year += 11;
-  year -= 2;
-  year %= 7;
-  year = 7-year;
-  return dows[year];
+	var year = (new Date()).getFullYear() % 100;
+	if(year % 2 == 1) year += 11;
+	year /= 2;
+	if(year % 2 == 1) year += 11;
+	year -= 2;
+	year %= 7;
+	year = 7-year;
+	return dows[year];
 }
 function numToOrdinal(num){
-  if(num == 1) return num + 'st';
-  if(num == 2) return num + 'nd';
-  if(num == 3) return num + 'rd';
-  return num + 'th';
+	if(num == 1) return num + 'st';
+	if(num == 2) return num + 'nd';
+	if(num == 3) return num + 'rd';
+	return num + 'th';
 }
 
 function walkthrough(day){
-  var datecopy = new Date(day);
-  var leapYear = false;
-  if(day.getFullYear() % 4 == 0)
-	if(day.getFullYear() % 400 == 0)
-	  if(day.getFullYear() % 100 != 0)
-		leapYear = true;
+	var datecopy = new Date(day);
+	var leapYear = false;
+	if(day.getFullYear() % 4 == 0)
+		if(day.getFullYear() % 400 == 0)
+			if(day.getFullYear() % 100 != 0)
+				leapYear = true;
 
-  var month = day.getMonth();
-  var monthName = months[month];
-  var date = day.getDate();
+	var month = day.getMonth();
+	var monthName = months[month];
+	var date = day.getDate();
 
-  var output = "Let's figure out " + months[day.getMonth()] + " " + numToOrdinal(day.getDate()) + ". ";
-  var anchor = undefined;
-  switch(month)
-  {
-	case 0:
-	  if(leapYear){
-		output = "It's a leap year so January 4th is our anchor day. ";
-		anchor = datecopy.setDate(4);
-
-		}
-
-	  }
-	  break;
-  }
+	var output = "Let's figure out " + months[day.getMonth()] + " " + numToOrdinal(day.getDate()) + ". ";
+	var anchor = undefined;
+	switch(month)
+	{
+		case 0:
+			if(leapYear){
+				output = "It's a leap year so January 4th is our anchor day. ";
+				anchor = datecopy.setDate(4);
+			} else {
+				output = "It's not a leap year so January 3rd is our anchor day. ";
+				achor = datecopy.setDate(3);
+			}
+			break;
+	}
 	var daysAway = Math.round((a-b)/(1000*60*60*24));
 	if(daysAway == 0){
 		output += "And we're done! Our day was a doomsday so the answer is " + getDoomsday();
@@ -148,80 +148,80 @@ function walkthrough(day){
 }
 
 const handlers = {
-  'LaunchRequest': function () {
-	var res = "This year's doomsday is " + getDoomsday() +
-	  ". Ask me to quiz you or say help for an explanation of " +
-	  "what the doomsday rule is";
-	this.emit(":ask", res);
-  },
-  'test': function(){
-	this.emit(":tell", 'okay');
-  },
-  'quiz': function ()	{
+	'LaunchRequest': function () {
+		var res = "This year's doomsday is " + getDoomsday() +
+			". Ask me to quiz you or say help for an explanation of " +
+			"what the doomsday rule is";
+		this.emit(":ask", res);
+	},
+	'test': function(){
+		this.emit(":tell", 'okay');
+	},
+	'quiz': function ()	{
 
-	var intent = this.event.request.intent;
-	var attrs = this.event.session.attributes;
+		var intent = this.event.request.intent;
+		var attrs = this.event.session.attributes;
 
-	//if we supplied a date it means they should be guessing now
-	if(intent.slots.date.value) {
-	  //if(attrs.date){
-	  var guess = intent.slots.date.value;
-	  var date = new Date(attrs.date);
-	  //this.emit(':tell', guess + ' ' + date);
-	  if(guess == 'help'){
+		//if we supplied a date it means they should be guessing now
+		if(intent.slots.date.value) {
+			//if(attrs.date){
+			var guess = intent.slots.date.value;
+			var date = new Date(attrs.date);
+			//this.emit(':tell', guess + ' ' + date);
+			if(guess == 'help'){
 
-		this.emit(':tell', "Sure, here's how I'd do it...");
-	  }
-	  var ans = dows[date.getDay()];
-	  if(ans == guess){
-		this.emit(':tell', 'nice, you got it right');
-	  }
-	  else{
-		if(attrs.badGuesses < 2){
-		  attrs.badGuesses++;
-		  resp = "Whoops, wrong answer.  Try again or say 'I give up' and I'll walk you through it";
-		  this.emit(':elicitSlot',
+				this.emit(':tell', "Sure, here's how I'd do it...");
+			}
+			var ans = dows[date.getDay()];
+			if(ans == guess){
+				this.emit(':tell', 'nice, you got it right');
+			}
+			else{
+				if(attrs.badGuesses < 2){
+					attrs.badGuesses++;
+					resp = "Whoops, wrong answer.  Try again or say 'I give up' and I'll walk you through it";
+					this.emit(':elicitSlot',
+						'date',
+						resp,
+						'I\'ll give you some more time',
+						intent);
+				}
+				else
+				{
+					this.emit(':tell', "hmm, still no luck.. Here's how I'd do it");
+				}
+			}
+
+
+		}
+		var randomDate = randomDateThisYear();
+		attrs.date = randomDate;
+		attrs.badGuesses = 0;
+		var resp = "What day of the week is " + months[randomDate.getMonth()] + " " + numToOrdinal(randomDate.getDate()) + "?";
+
+		//this.emit(':tell', resp);
+		this.emit(':elicitSlot',
 			'date',
 			resp,
 			'I\'ll give you some more time',
 			intent);
-		}
-		else
-		{
-		  this.emit(':tell', "hmm, still no luck.. Here's how I'd do it");
-		}
-	  }
+	},
+	'AMAZON.HelpIntent': function () {
+		const speechOutput = 
+			"The 'doomsday rule' is a way for you to figure out which day" + 
+			" of the week a date will fall on." + 
+			" Once you know the year's doomsday there's a day of each month you can use to help you figure out any day. " +
+			" Doomsday is the last day of February. This year that's a " + getDoomsday() + ". Even months starting with April have a doomsday on the date matching the month number. In other words April 4th, June 6th, August 8th, October 10th and December 12th will all be on a " + getDoomsday() + " this year. For odd numbered months you can remember the phrase 'I work nine to five at seven eleven'.  The fifth of the ninth month, September 5th, and the ninth of the fifth month, May 9th, are both " + getDoomsday() + " same with the 7th of the eleventh month, and the eleventh of the 7th month. So November 7th and July 11th.  For January you can remember three quarters of the time, when it is not a leap year January 3rd will be doomsday. The other time, on leap years, the 4th will be doomsday.  For February you count backwards from the last day which is doomsday.  And finally March you count forward from what we call March zeroth";
 
-
-	}
-	var randomDate = randomDateThisYear();
-	attrs.date = randomDate;
-	attrs.badGuesses = 0;
-	var resp = "What day of the week is " + months[randomDate.getMonth()] + " " + numToOrdinal(randomDate.getDate()) + "?";
-
-	//this.emit(':tell', resp);
-	this.emit(':elicitSlot',
-	  'date',
-	  resp,
-	  'I\'ll give you some more time',
-	  intent);
-  },
-  'AMAZON.HelpIntent': function () {
-	const speechOutput = 
-	  "The 'doomsday rule' is a way for you to figure out which day" + 
-	  " of the week a date will fall on." + 
-	  " Once you know the year's doomsday there's a day of each month you can use to help you figure out any day. " +
-	  " Doomsday is the last day of February. This year that's a " + getDoomsday() + ". Even months starting with April have a doomsday on the date matching the month number. In other words April 4th, June 6th, August 8th, October 10th and December 12th will all be on a " + getDoomsday() + " this year. For odd numbered months you can remember the phrase 'I work nine to five at seven eleven'.  The fifth of the ninth month, September 5th, and the ninth of the fifth month, May 9th, are both " + getDoomsday() + " same with the 7th of the eleventh month, and the eleventh of the 7th month. So November 7th and July 11th.  For January you can remember three quarters of the time, when it is not a leap year January 3rd will be doomsday. The other time, on leap years, the 4th will be doomsday.  For February you count backwards from the last day which is doomsday.  And finally March you count forward from what we call March zeroth";
-
-	this.response.speak(speechOutput);
-	this.emit(':responseReady');
-  },
-  'AMAZON.CancelIntent': function () {
-	this.response.speak(STOP_MESSAGE);
-	this.emit(':responseReady');
-  },
-  'AMAZON.StopIntent': function () {
-	this.response.speak(STOP_MESSAGE);
-	this.emit(':responseReady');
-  },
+		this.response.speak(speechOutput);
+		this.emit(':responseReady');
+	},
+	'AMAZON.CancelIntent': function () {
+		this.response.speak(STOP_MESSAGE);
+		this.emit(':responseReady');
+	},
+	'AMAZON.StopIntent': function () {
+		this.response.speak(STOP_MESSAGE);
+		this.emit(':responseReady');
+	},
 };
